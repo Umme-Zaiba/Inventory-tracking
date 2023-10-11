@@ -52,8 +52,8 @@ class _IntroScreenViewState extends State<IntroScreenView> with SingleTickerProv
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 246, 204, 150),
-                Color.fromARGB(255, 238, 218, 246),
+                Color.fromARGB(255, 245, 181, 99),
+                Color.fromARGB(255, 230, 171, 253),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,

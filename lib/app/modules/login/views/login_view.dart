@@ -1,26 +1,59 @@
 import 'package:flutter/material.dart';
-
 import 'package:get/get.dart';
 import 'package:inventory/app/routes/app_pages.dart';
 import 'package:lottie/lottie.dart';
 
 import '../controllers/login_controller.dart';
 
-// class LoginView extends GetView<LoginController> {
-
 class LoginView extends StatefulWidget {
-  const LoginView({super.key});
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   State<LoginView> createState() => _LoginViewState();
 }
 
 class _LoginViewState extends State<LoginView> {
- String _email = '';
-  String _password = '';
-  String _selectedRole = 'Sales';
+  final TextEditingController usernameController = TextEditingController();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
 
-  final List<String> _roles = ['Sales', 'Admin', 'Purchase'];
+  final _formKey = GlobalKey<FormState>();
+
+  // Validation functions
+  String? validateUsername(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Username is required';
+    }
+    return null;
+  }
+
+  String? validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Email is required';
+    }
+    if (!GetUtils.isEmail(value)) {
+      return 'Invalid email format';
+    }
+    return null;
+  }
+
+  String? validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    // Password pattern: Minimum 8 characters, at least one uppercase letter, one lowercase letter, one number, and one special character
+    final passwordPattern = r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$';
+    if (!RegExp(passwordPattern).hasMatch(value)) {
+      return 'Invalid password format: Minimum 8 characters, at least one uppercase letter, one lowercase letter, one number, and one special character';
+    }
+    return null;
+  }
+
+  Map<String, String> errorMessages = {
+    'username': '',
+    'email': '',
+    'password': '',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -31,110 +64,121 @@ class _LoginViewState extends State<LoginView> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                Color.fromARGB(255, 253, 233, 207),
-                Color.fromARGB(255, 242, 221, 251),
+                Color.fromARGB(255, 236, 212, 178),
+                Color.fromARGB(255, 242, 224, 252),
               ],
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
             ),
           ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              
-              SizedBox(height: 30),
-        
-              Lottie.asset('assets/lottie/signin.json',
-                height: 150,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 30, right: 30),
-                child: Text(
-                  'We are glad to have you on board. Sign in now and enjoy the benefits.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 15,
-                    // fontWeight: FontWeight.bold,
-                    color: Colors.grey[700],
-                    
-                  ),
-                ),
-                
-              ),
-              SizedBox(height: 30),
-                    // email textfield
+          child: Center(
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 30),
+                    Lottie.asset(
+                      'assets/lottie/signin.json',
+                      height: 120,
+                    ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 25.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          border: Border.all(color: Colors.orangeAccent),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 20.0),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Name',
-                            ),
-                          ),
+                      padding: const EdgeInsets.only(left: 30, right: 30),
+                      child: Text(
+                        'We are glad to have you on board. Sign in now and enjoy the benefits.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.grey[800],
                         ),
                       ),
                     ),
-              
-                    // password textfield
-                    SizedBox(height: 10),
+                    SizedBox(height: 30),
                     Padding(
                       padding: EdgeInsets.symmetric(horizontal: 25.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          border: Border.all(color: Colors.orangeAccent),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 20.0),
-                          child: TextField(
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Email',
-                            ),
+                      child: TextFormField(
+                        controller: usernameController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.orangeAccent),
                           ),
+                          hintText: 'Username',
                         ),
+                        validator: (value) {
+                          final errorMessage = validateUsername(value);
+                          errorMessages['username'] = errorMessage ?? '';
+                          return errorMessage;
+                        },
                       ),
                     ),
-              
-                    // password textfield
-                    SizedBox(height: 10),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 25.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[200],
-                          border: Border.all(color: Colors.orangeAccent),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 20.0),
-                          child: TextField(
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              border: InputBorder.none,
-                              hintText: 'Password',
-                            ),
-                          ),
-                        ),
+                    Text(
+                      errorMessages['username'] ?? '',
+                      style: TextStyle(
+                        color: Colors.orangeAccent,
                       ),
                     ),
                     SizedBox(height: 10),
-                    // Sign in button
+                    // Repeat similar code for email and password fields...
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 25.0),
+                      child: TextFormField(
+                        controller: emailController,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.orangeAccent),
+                          ),
+                          hintText: 'Email',
+                        ),
+                        validator: (value) {
+                          final errorMessage = validateEmail(value);
+                          errorMessages['email'] = errorMessage ?? '';
+                          return errorMessage;
+                        },
+                      ),
+                    ),
+                    Text(
+                      errorMessages['email'] ?? '',
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 25.0),
+                      child: TextFormField(
+                        controller: passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide(color: Colors.orangeAccent),
+                          ),
+                          hintText: 'Password',
+                        ),
+                        validator: (value) {
+                          final errorMessage = validatePassword(value);
+                          errorMessages['password'] = errorMessage ?? '';
+                          return errorMessage;
+                        },
+                      ),
+                    ),
+                    Text(
+                      errorMessages['password'] ?? '',
+                      style: TextStyle(
+                        color: Colors.red,
+                      ),
+                    ),
+                    SizedBox(height: 10),
                     Padding(
                       padding: EdgeInsets.all(0.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          Get.toNamed(Routes.HOME);
+                          if (_formKey.currentState!.validate()) {
+                            Get.toNamed(Routes.HOME);
+                          }
                         },
                         child: Padding(
                           padding: EdgeInsets.symmetric(
@@ -142,32 +186,30 @@ class _LoginViewState extends State<LoginView> {
                           child: Text(
                             "Sign In",
                             style: TextStyle(
-                              color: Colors.grey[700],
+                              color: Colors.grey[800],
                               fontSize: 18,
                             ),
                           ),
                         ),
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.deepPurple[100],
+                          primary: const Color.fromARGB(255, 211, 189, 251),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
+                            
                           ),
                           elevation: 15,
                         ),
                       ),
                     ),
                     SizedBox(height: 25),
-              
-                    // not a member
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'New memeber?',
+                          'New member?',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            // fontStyle: FontStyle.italic,
-                            color: Colors.grey[700],
+                            color: Colors.grey[800],
                           ),
                         ),
                         GestureDetector(
@@ -176,7 +218,7 @@ class _LoginViewState extends State<LoginView> {
                           },
                           child: InkWell(
                             child: Text(
-                              ' Register Now',                      
+                              ' Register Now',
                               style: TextStyle(
                                 color: Color.fromARGB(255, 250, 161, 44),
                                 fontWeight: FontWeight.bold,
@@ -186,12 +228,15 @@ class _LoginViewState extends State<LoginView> {
                         ),
                       ],
                     ),
-            ],
+                    
+              SizedBox(height: 250,)
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
-    ),
     );
   }
 }
-
